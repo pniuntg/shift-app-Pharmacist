@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>ตารางเวร</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#4338ca">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="ตารางเวร">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="favicon.png">
+<style>
+  /* ============ ตั้งค่า: วางลิงก์ Web app (/exec) ไว้ที่ APP_URL ด้านล่าง ============ */
+  html,body{margin:0;height:100%;background:#f8fafc;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+  body{padding-top:env(safe-area-inset-top);box-sizing:border-box}
+  #app{position:fixed;left:0;right:0;bottom:0;top:env(safe-area-inset-top);width:100%;height:calc(100% - env(safe-area-inset-top));border:0;display:block;background:#fff}
+  #splash{position:fixed;inset:0;display:grid;place-items:center;background:#4338ca;color:#fff;z-index:2;transition:opacity .3s}
+  #splash.hide{opacity:0;pointer-events:none}
+  #splash img{width:96px;height:96px;border-radius:22px;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+  #splash p{margin:14px 0 0;font-size:16px;font-weight:600;text-align:center}
+  #splash small{display:block;opacity:.8;font-weight:400;margin-top:6px}
+  .msg{position:fixed;inset:0;display:none;place-items:center;padding:24px;text-align:center;background:#f8fafc;color:#1e293b;z-index:3}
+  .msg.on{display:grid}
+  .msg button{margin-top:14px;padding:10px 22px;border:0;border-radius:10px;background:#4338ca;color:#fff;font-size:15px}
+</style>
+</head>
+<body>
+<div id="splash"><div style="text-align:center"><img src="icon-192.png" alt=""><p>ตารางเวร<small>กำลังโหลด…</small></p></div></div>
+<div id="offline" class="msg"><div><div style="font-size:40px">📶</div><b>ไม่มีอินเทอร์เน็ต</b><div style="color:#64748b;margin-top:6px">ต่ออินเทอร์เน็ตแล้วกดลองใหม่</div><button onclick="location.reload()">ลองใหม่</button></div></div>
+<div id="setup" class="msg"><div><div style="font-size:40px">⚙️</div><b>ยังไม่ได้ใส่ลิงก์ระบบ</b><div style="color:#64748b;margin-top:6px">แก้ไฟล์ index.html → ใส่ลิงก์ Web app (ลงท้าย /exec) ที่ APP_URL</div></div></div>
+<iframe id="app" title="ตารางเวร" allow="clipboard-write"></iframe>
+<script>
+  // ▼▼▼ วางลิงก์ Web app ของ Apps Script (Deploy → Manage deployments → Web app URL ลงท้ายด้วย /exec) ▼▼▼
+  const APP_URL = 'https://script.google.com/macros/s/AKfycbwSs-wDiIE60k4fop2-XC8pwx2roLQ659lAw17DP99qeCfQSsRKnPQ-1fcZbnGELtDh/exec';
+  // ▲▲▲
+
+  const $ = id => document.getElementById(id);
+  if (!/^https:\/\/script\.google\.com\/.+\/exec/.test(APP_URL) || APP_URL.includes('วางรหัสตรงนี้')) { $('splash').classList.add('hide'); $('setup').classList.add('on'); }
+  else if (!navigator.onLine) { $('splash').classList.add('hide'); $('offline').classList.add('on'); }
+  else {
+    const f = $('app');
+    f.addEventListener('load', () => setTimeout(() => $('splash').classList.add('hide'), 300));
+    setTimeout(() => $('splash').classList.add('hide'), 12000);
+    f.src = APP_URL;
+  }
+  window.addEventListener('offline', () => $('offline').classList.add('on'));
+  window.addEventListener('online', () => $('offline').classList.remove('on'));
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+</script>
+</body>
+</html>
